@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Workspace from './components/Workspace';
@@ -6,8 +5,30 @@ import { Camera, Menu } from 'lucide-react';
 
 const App: React.FC = () => {
   const [activeMenu, setActiveMenu] = useState<string>('Beranda');
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+
+  // Initialize Dark Mode from localStorage or system preference
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      if (saved) {
+        return saved === 'dark';
+      }
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
+
+  // Apply Dark Mode class to the document root
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
 
   // Toggle Dark Mode Handler
   const toggleDarkMode = () => {
@@ -21,8 +42,7 @@ const App: React.FC = () => {
   };
 
   return (
-    // Apply 'dark' class conditionally to the wrapper div
-    <div className={`${isDarkMode ? 'dark' : ''} flex flex-col md:flex-row w-full h-screen bg-white dark:bg-dark-bg font-sans overflow-hidden transition-colors duration-300`}>
+    <div className="flex flex-col md:flex-row w-full h-screen bg-white dark:bg-dark-bg font-sans overflow-hidden transition-colors duration-300">
       
       {/* Mobile Header - Visible only on mobile */}
       <header className="md:hidden h-16 bg-white dark:bg-dark-sidebar border-b border-gray-100 dark:border-dark-border flex items-center justify-between px-4 shrink-0 transition-colors z-30">
